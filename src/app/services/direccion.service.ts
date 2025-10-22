@@ -8,7 +8,7 @@ import { Direccion, DireccionResponse, CreateDireccionRequest } from '../interfa
   providedIn: 'root'
 })
 export class DireccionService {
-  private readonly API_URL = 'http://localhost:8080/direcciones';
+  private readonly API_URL = 'http://localhost:8888/direcciones';
 
   constructor(private http: HttpClient) {}
 
