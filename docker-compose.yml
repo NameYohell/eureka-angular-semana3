@@ -1,0 +1,36 @@
+version: '3.8'
+
+services:
+  eureka-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: eureka-angular-app
+    ports:
+      - "8080:80"
+    restart: unless-stopped
+    networks:
+      - eureka-network
+
+  # Servicio para desarrollo (opcional)
+  eureka-dev:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    container_name: eureka-angular-dev
+    ports:
+      - "4200:4200"
+    volumes:
+      - .:/app
+      - /app/node_modules
+    environment:
+      - CHOKIDAR_USEPOLLING=true
+    restart: unless-stopped
+    networks:
+      - eureka-network
+    profiles:
+      - dev
+
+networks:
+  eureka-network:
+    driver: bridge

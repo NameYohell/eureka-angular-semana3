@@ -1,0 +1,23 @@
+# Dockerfile para desarrollo con hot reload
+FROM node:22-alpine
+
+# Establecer directorio de trabajo
+WORKDIR /app
+
+# Instalar Angular CLI globalmente
+RUN npm install -g @angular/cli@20.3.5
+
+# Copiar archivos de configuración de dependencias
+COPY package*.json ./
+
+# Instalar dependencias
+RUN npm ci
+
+# Copiar código fuente
+COPY . .
+
+# Exponer puerto 4200 para desarrollo
+EXPOSE 4200
+
+# Comando para ejecutar en modo desarrollo
+CMD ["ng", "serve", "--host", "0.0.0.0", "--port", "4200", "--poll", "2000"]

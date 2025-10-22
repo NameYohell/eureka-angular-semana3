@@ -11,6 +11,9 @@ Una aplicación Angular moderna construida con arquitectura standalone (sin AppM
 - ✅ **Routing Configurado** - Navegación mediante provideRouter
 - ✅ **Componentes Modulares** - Estructura organizada por funcionalidades
 - ✅ **Diseño Responsivo** - Adaptable a diferentes dispositivos
+- ✅ **Docker Ready** - Containerización completa con Docker y Docker Compose
+- ✅ **Multi-stage Build** - Optimización para producción con Nginx
+- ✅ **Hot Reload** - Desarrollo con recarga automática en contenedor
 
 ## 🏗️ Estructura del Proyecto
 
@@ -33,6 +36,11 @@ eureka-app/
 │   ├── main.ts                    # Punto de entrada de la aplicación
 │   ├── styles.css                 # Estilos globales con Tailwind
 │   └── index.html                 # HTML principal
+├── Dockerfile                     # Imagen Docker para producción
+├── Dockerfile.dev                 # Imagen Docker para desarrollo
+├── docker-compose.yml             # Orquestación de contenedores
+├── nginx.conf                     # Configuración del servidor Nginx
+├── .dockerignore                  # Archivos ignorados por Docker
 ├── tailwind.config.ts             # Configuración de Tailwind CSS
 ├── package.json                   # Dependencias del proyecto
 └── README.md                      # Este archivo
@@ -48,13 +56,65 @@ eureka-app/
 | Tailwind CSS | 4.1.14 | Framework CSS |
 | Node.js | 22.20.0 | Runtime de JavaScript |
 | npm | 10.9.3 | Gestor de paquetes |
+| Docker | Latest | Containerización |
+| Nginx | Alpine | Servidor web para producción |
 
 ## ⚡ Instalación y Configuración
+
+### 🐳 Opción 1: Instalación con Docker (Recomendado)
+
+#### Prerrequisitos
+- [Docker](https://www.docker.com/get-started) instalado
+- [Docker Compose](https://docs.docker.com/compose/install/) instalado
+
+#### 🚀 Ejecutar en Producción
+```bash
+# Clonar el repositorio
+git clone <https://github.com/NameYohell/eureka-angular-semana3.git>
+cd eureka-angular-semana3
+
+# Construir y ejecutar con Docker Compose
+docker-compose up -d
+
+# La aplicación estará disponible en http://localhost:8080
+```
+
+#### 🛠️ Ejecutar en Desarrollo (con hot reload)
+```bash
+# Ejecutar en modo desarrollo
+docker-compose --profile dev up -d
+
+# La aplicación estará disponible en http://localhost:4200
+# Los cambios se reflejarán automáticamente
+```
+
+#### 📦 Comandos Docker Útiles
+```bash
+# Ver logs de la aplicación
+docker-compose logs -f eureka-app
+
+# Detener los contenedores
+docker-compose down
+
+# Reconstruir las imágenes
+docker-compose up --build
+
+# Ejecutar comandos dentro del contenedor
+docker-compose exec eureka-app sh
+```
+
+### 💻 Opción 2: Instalación Local
+
+#### Prerrequisitos
+- Node.js 22.20.0 o superior
+- npm 10.9.3 o superior
+
+#### 🚀 Pasos de Instalación
 
 ### 1. Clonar el Repositorio
 ```bash
 git clone <url-del-repositorio>
-cd eureka-app
+cd eureka-angular-semana3
 ```
 
 ### 2. Instalar Dependencias
@@ -128,9 +188,27 @@ La aplicación estará disponible en `http://localhost:4200/`
 
 ## 🔧 Comandos Disponibles
 
+### 🐳 Comandos Docker
+```bash
+# Producción
+docker-compose up -d                    # Ejecutar en producción (puerto 8080)
+docker-compose down                     # Detener contenedores
+docker-compose up --build              # Reconstruir y ejecutar
+docker-compose logs -f eureka-app       # Ver logs en tiempo real
+
+# Desarrollo
+docker-compose --profile dev up -d      # Ejecutar en desarrollo (puerto 4200)
+docker-compose --profile dev down       # Detener desarrollo
+
+# Gestión de imágenes
+docker build -t eureka-app .            # Construir imagen manualmente
+docker run -p 8080:80 eureka-app        # Ejecutar contenedor manualmente
+```
+
+### 💻 Comandos Locales
 ```bash
 # Desarrollo
-npm start                 # Inicia servidor de desarrollo
+npm start                 # Inicia servidor de desarrollo (puerto 4200)
 npm run build            # Construye para producción
 npm run watch            # Construye en modo watch
 npm test                 # Ejecuta pruebas unitarias
@@ -270,7 +348,34 @@ interface Item {
 
 Este proyecto está bajo la Licencia MIT - ver el archivo [LICENSE](LICENSE) para detalles.
 
-## 👨‍💻 Autor
+## � Información Detallada de Docker
+
+### 📁 Archivos Docker
+- **`Dockerfile`**: Imagen multi-etapa para producción con Nginx
+- **`Dockerfile.dev`**: Imagen para desarrollo con hot reload
+- **`docker-compose.yml`**: Orquestación completa de servicios
+- **`nginx.conf`**: Configuración optimizada de Nginx para SPA
+- **`.dockerignore`**: Archivos excluidos del contexto de Docker
+
+### 🏗️ Arquitectura Multi-Stage Build
+1. **Etapa Build**: Node.js Alpine para compilar la aplicación
+2. **Etapa Producción**: Nginx Alpine para servir archivos estáticos
+
+### 🚀 Características de la Imagen Docker
+- **Tamaño optimizado**: ~50MB (imagen final)
+- **Seguridad**: Basada en Alpine Linux
+- **Performance**: Nginx con compresión gzip habilitada
+- **SPA Support**: Configuración para Single Page Applications
+- **Cache**: Headers optimizados para archivos estáticos
+
+### 🌐 Puertos y Servicios
+- **Producción**: `http://localhost:8080`
+- **Desarrollo**: `http://localhost:4200`
+
+### 🔧 Variables de Entorno (Desarrollo)
+- `CHOKIDAR_USEPOLLING=true`: Habilita polling para file watching en contenedores
+
+## �👨‍💻 Autor
 
 **Yohel Vasquez**
 - Portfolio: [tu-portfolio.com](#)
@@ -278,6 +383,20 @@ Este proyecto está bajo la Licencia MIT - ver el archivo [LICENSE](LICENSE) par
 - LinkedIn: [Yohel Vasquez](#)
 
 ## 🆘 Solución de Problemas
+
+### Problemas con Docker
+```bash
+# Error de permisos en Windows
+docker-compose down
+docker system prune -a
+docker-compose up --build
+
+# Ver logs detallados
+docker-compose logs -f
+
+# Acceder al contenedor
+docker-compose exec eureka-app sh
+```
 
 ### Problema: Error al iniciar la aplicación
 ```bash
