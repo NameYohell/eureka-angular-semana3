@@ -21,8 +21,22 @@ RUN npm run build
 # Etapa 2: Servidor nginx para servir la aplicación
 FROM nginx:alpine
 
-# Copiar archivos compilados desde la etapa de build
-COPY --from=build /app/dist/eureka-app /usr/share/nginx/html
+# Remover la configuración por defecto de nginx
+RUN rm -rf /usr/share/nginx/html/*
+
+# Crear directorio temporal y copiar archivos compilados
+RUN mkdir -p /tmp/dist
+COPY --from=build /app/dist/ /tmp/dist/
+
+# Script para encontrar y copiar los archivos correctos
+RUN if [ -d "/tmp/dist/eureka-app/browser" ]; then \
+        cp -r /tmp/dist/eureka-app/browser/* /usr/share/nginx/html/; \
+    elif [ -d "/tmp/dist/eureka-app" ]; then \
+        cp -r /tmp/dist/eureka-app/* /usr/share/nginx/html/; \
+    else \
+        cp -r /tmp/dist/* /usr/share/nginx/html/; \
+    fi && \
+    rm -rf /tmp/dist
 
 # Copiar configuración personalizada de nginx
 COPY nginx.conf /etc/nginx/conf.d/default.conf
