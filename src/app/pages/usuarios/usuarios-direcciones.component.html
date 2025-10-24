@@ -1,0 +1,812 @@
+<div class="min-h-screen bg-gray-50 py-8">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <!-- Header -->
+    <div class="bg-white rounded-lg shadow-sm p-6 mb-6">
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <h1 class="text-2xl font-bold text-gray-900">Gestión de Usuarios</h1>
+          <p class="mt-1 text-sm text-gray-600">
+            Gestiona usuarios y direcciones de forma integrada
+          </p>
+        </div>
+        <div class="mt-4 sm:mt-0">
+          <button
+            (click)="toggleIntegratedForm()"
+            class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors"
+          >
+            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+            </svg>
+            {{ showIntegratedForm ? 'Cancelar' : 'Crear Usuario' }}
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Barra de Búsqueda -->
+    <div class="bg-white rounded-lg shadow-sm p-6 mb-6">
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div class="flex-1 max-w-md">
+          <label class="block text-sm font-medium text-gray-700 mb-2">
+            Buscar por Email
+          </label>
+          <div class="relative">
+            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+              </svg>
+            </div>
+            <input 
+              type="email"
+              [(ngModel)]="searchEmail"
+              (input)="onSearchEmailChange()"
+              placeholder="Buscar usuario por email..."
+              class="block w-full pl-10 pr-10 py-2.5 text-gray-900 bg-gray-50 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+            >
+            <div class="absolute inset-y-0 right-0 pr-3 flex items-center">
+              <button 
+                *ngIf="searchEmail"
+                type="button"
+                (click)="clearSearch()"
+                class="text-gray-400 hover:text-gray-600 focus:outline-none"
+              >
+                <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                </svg>
+              </button>
+            </div>
+          </div>
+        </div>
+        <div class="text-sm text-gray-600">
+          <span class="font-medium">{{ usuariosFiltrados.length }}</span> 
+          {{ usuariosFiltrados.length === 1 ? 'usuario encontrado' : 'usuarios encontrados' }}
+        </div>
+      </div>
+    </div>
+    
+    <!-- Formulario Integrado -->
+    <div *ngIf="showIntegratedForm" class="bg-white rounded-lg shadow-md p-6 mb-6 border-2 border-blue-300">
+      <h3 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+        <svg class="w-5 h-5 mr-2 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/>
+        </svg>
+        Nuevo Usuario y Direcciones
+      </h3>
+      <form [formGroup]="integratedForm" (ngSubmit)="onIntegratedSubmit()" class="space-y-6">
+        <!-- Datos del Usuario -->
+        <div>
+          <h4 class="text-sm font-semibold text-gray-700 uppercase mb-3 pb-2 border-b border-gray-200">
+            📋 Datos del Usuario
+          </h4>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Nombre *</label>
+              <input 
+                type="text" 
+                formControlName="nombre" 
+                class="block w-full px-4 py-2.5 text-gray-900 bg-gray-50 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                placeholder="Ingrese el nombre completo"
+              >
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Email *</label>
+              <input 
+                type="email" 
+                formControlName="email" 
+                class="block w-full px-4 py-2.5 text-gray-900 bg-gray-50 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                placeholder="correo@ejemplo.com"
+              >
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Teléfono *</label>
+              <input 
+                type="tel" 
+                formControlName="telefono" 
+                class="block w-full px-4 py-2.5 text-gray-900 bg-gray-50 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                placeholder="+56 9 1234 5678"
+              >
+            </div>
+          </div>
+        </div>
+
+        <!-- Sección de Direcciones -->
+        <div>
+          <div class="flex items-center justify-between mb-3 pb-2 border-b border-gray-200">
+            <h4 class="text-sm font-semibold text-gray-700 uppercase">
+              📍 Direcciones ({{ tempDirecciones.length }})
+            </h4>
+            <button
+              type="button"
+              (click)="showAddDireccionInCreation = !showAddDireccionInCreation"
+              class="inline-flex items-center px-3 py-1.5 text-xs font-medium text-blue-700 bg-blue-50 border border-blue-300 rounded-md hover:bg-blue-100 transition-colors"
+            >
+              <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+              </svg>
+              {{ showAddDireccionInCreation ? 'Cancelar' : 'Agregar Dirección' }}
+            </button>
+          </div>
+
+          <!-- Formulario para agregar dirección temporal -->
+          <div *ngIf="showAddDireccionInCreation" class="mb-4 p-4 bg-blue-50 rounded-lg border border-blue-200">
+            <h5 class="text-sm font-semibold text-gray-900 mb-3">Nueva Dirección</h5>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+              <div class="md:col-span-2">
+                <label class="block text-xs font-medium text-gray-700 mb-1">Calle y Número *</label>
+                <input 
+                  type="text" 
+                  [(ngModel)]="newDireccion.calle"
+                  [ngModelOptions]="{standalone: true}"
+                  class="block w-full px-3 py-2 text-sm text-gray-900 bg-white border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  placeholder="Ej: Av. Libertador 1234"
+                >
+              </div>
+              <div>
+                <label class="block text-xs font-medium text-gray-700 mb-1">Comuna *</label>
+                <input 
+                  type="text" 
+                  [(ngModel)]="newDireccion.comuna"
+                  [ngModelOptions]="{standalone: true}"
+                  class="block w-full px-3 py-2 text-sm text-gray-900 bg-white border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  placeholder="Ej: Providencia"
+                >
+              </div>
+              <div>
+                <label class="block text-xs font-medium text-gray-700 mb-1">Ciudad *</label>
+                <input 
+                  type="text" 
+                  [(ngModel)]="newDireccion.ciudad"
+                  [ngModelOptions]="{standalone: true}"
+                  class="block w-full px-3 py-2 text-sm text-gray-900 bg-white border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  placeholder="Ej: Santiago"
+                >
+              </div>
+              <div>
+                <label class="block text-xs font-medium text-gray-700 mb-1">Código Postal *</label>
+                <input 
+                  type="text" 
+                  [(ngModel)]="newDireccion.codigoPostal"
+                  [ngModelOptions]="{standalone: true}"
+                  class="block w-full px-3 py-2 text-sm text-gray-900 bg-white border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  placeholder="Ej: 7500000"
+                >
+              </div>
+              <div>
+                <label class="block text-xs font-medium text-gray-700 mb-1">País *</label>
+                <input 
+                  type="text" 
+                  [(ngModel)]="newDireccion.pais"
+                  [ngModelOptions]="{standalone: true}"
+                  class="block w-full px-3 py-2 text-sm text-gray-900 bg-white border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  placeholder="Ej: Chile"
+                >
+              </div>
+            </div>
+            <div class="flex gap-2 mt-3">
+              <button
+                type="button"
+                (click)="addTempDireccion()"
+                [disabled]="!isValidNewDireccion()"
+                class="flex-1 inline-flex justify-center items-center px-3 py-2 text-xs font-semibold rounded-md text-white bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              >
+                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+                </svg>
+                Agregar a la Lista
+              </button>
+              <button
+                type="button"
+                (click)="cancelAddTempDireccion()"
+                class="flex-1 inline-flex justify-center items-center px-3 py-2 text-xs font-semibold rounded-md text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 transition-colors"
+              >
+                Cancelar
+              </button>
+            </div>
+          </div>
+
+          <!-- Lista de direcciones temporales -->
+          <div *ngIf="tempDirecciones.length > 0" class="space-y-2">
+            <div *ngFor="let direccion of tempDirecciones; let i = index" class="bg-gray-50 p-3 rounded-md border border-gray-200 flex items-start justify-between">
+              <div class="flex-1">
+                <div class="space-y-1">
+                  <p class="text-sm font-medium text-gray-900">
+                    <span class="font-medium">Dirección:</span> {{ direccion.calle }}
+                  </p>
+                  <p class="text-xs text-gray-600">
+                    <span class="font-medium">Comuna:</span> {{ direccion.comuna }}
+                  </p>
+                  <p class="text-xs text-gray-600">
+                    <span class="font-medium">Ciudad:</span> {{ direccion.ciudad }}
+                  </p>
+                  <p class="text-xs text-gray-600">
+                    <span class="font-medium">Código Postal:</span> {{ direccion.codigoPostal }}
+                  </p>
+                  <p class="text-xs text-gray-600">
+                    <span class="font-medium">País:</span> {{ direccion.pais }}
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                (click)="removeTempDireccion(i)"
+                class="ml-3 p-1.5 text-red-600 hover:text-red-800 hover:bg-red-100 rounded transition-colors"
+                title="Eliminar dirección"
+              >
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          <!-- Mensaje si no hay direcciones -->
+          <div *ngIf="tempDirecciones.length === 0 && !showAddDireccionInCreation" class="text-center py-4 bg-gray-50 rounded-lg border border-gray-200">
+            <svg class="mx-auto h-8 w-8 text-gray-400 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+            </svg>
+            <p class="text-xs text-gray-500 mb-1">No hay direcciones agregadas</p>
+            <p class="text-xs text-gray-400">Debe agregar al menos una dirección</p>
+          </div>
+        </div>
+
+        <!-- Sección de Comentarios -->
+        <div>
+          <div class="flex items-center justify-between mb-3 pb-2 border-b border-gray-200">
+            <h4 class="text-sm font-semibold text-gray-700 uppercase">
+              💬 Comentarios ({{ tempComentarios.length }})
+            </h4>
+            <button
+              type="button"
+              (click)="showAddComentarioInCreation = !showAddComentarioInCreation"
+              class="inline-flex items-center px-3 py-1.5 text-xs font-medium text-green-700 bg-green-50 border border-green-300 rounded-md hover:bg-green-100 transition-colors"
+            >
+              <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+              </svg>
+              {{ showAddComentarioInCreation ? 'Cancelar' : 'Agregar Comentario' }}
+            </button>
+          </div>
+
+          <!-- Formulario para agregar comentario temporal -->
+          <div *ngIf="showAddComentarioInCreation" class="mb-4 p-4 bg-green-50 rounded-lg border border-green-200">
+            <h5 class="text-sm font-semibold text-gray-900 mb-3">Nuevo Comentario</h5>
+            <div class="space-y-3">
+              <div>
+                <label class="block text-xs font-medium text-gray-700 mb-1">Candidato *</label>
+                <input 
+                  type="text" 
+                  [(ngModel)]="newComentario.candidato"
+                  [ngModelOptions]="{standalone: true}"
+                  class="block w-full px-3 py-2 text-sm text-gray-900 bg-white border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                  placeholder="Ej: Juan Pérez"
+                >
+              </div>
+              <div>
+                <label class="block text-xs font-medium text-gray-700 mb-1">Texto del Comentario *</label>
+                <textarea 
+                  [(ngModel)]="newComentario.textoComentario"
+                  [ngModelOptions]="{standalone: true}"
+                  rows="3"
+                  class="block w-full px-3 py-2 text-sm text-gray-900 bg-white border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500 resize-none"
+                  placeholder="Escriba aquí su comentario..."
+                ></textarea>
+              </div>
+            </div>
+            <div class="flex gap-2 mt-3">
+              <button
+                type="button"
+                (click)="addTempComentario()"
+                [disabled]="!isValidNewComentario()"
+                class="flex-1 inline-flex justify-center items-center px-3 py-2 text-xs font-semibold rounded-md text-white bg-green-600 hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              >
+                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+                </svg>
+                Agregar a la Lista
+              </button>
+              <button
+                type="button"
+                (click)="cancelAddTempComentario()"
+                class="flex-1 inline-flex justify-center items-center px-3 py-2 text-xs font-semibold rounded-md text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 transition-colors"
+              >
+                Cancelar
+              </button>
+            </div>
+          </div>
+
+          <!-- Lista de comentarios temporales -->
+          <div *ngIf="tempComentarios.length > 0" class="space-y-2">
+            <div *ngFor="let comentario of tempComentarios; let i = index" class="bg-gray-50 p-3 rounded-md border border-gray-200 flex items-start justify-between">
+              <div class="flex-1">
+                <p class="text-sm font-medium text-gray-900">{{ comentario.candidato }}</p>
+                <p class="text-xs text-gray-600 mt-1">{{ comentario.textoComentario }}</p>
+              </div>
+              <button
+                type="button"
+                (click)="removeTempComentario(i)"
+                class="ml-3 p-1.5 text-red-600 hover:text-red-800 hover:bg-red-100 rounded transition-colors"
+                title="Eliminar comentario"
+              >
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          <!-- Mensaje si no hay comentarios -->
+          <div *ngIf="tempComentarios.length === 0 && !showAddComentarioInCreation" class="text-center py-4 bg-gray-50 rounded-lg border border-gray-200">
+            <svg class="mx-auto h-8 w-8 text-gray-400 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
+            </svg>
+            <p class="text-xs text-gray-500 mb-1">No hay comentarios agregados</p>
+            <p class="text-xs text-gray-400">Los comentarios son opcionales</p>
+          </div>
+        </div>
+
+        <div class="flex justify-end gap-3 pt-4 border-t border-gray-200">
+          <button
+            type="button"
+            (click)="cancelCreateUsuario()"
+            class="inline-flex justify-center items-center px-4 py-3 border border-gray-300 text-sm font-semibold rounded-lg text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-all shadow-sm hover:shadow-md"
+          >
+            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+            </svg>
+            Cancelar
+          </button>
+          <button
+            type="submit"
+            [disabled]="integratedForm.invalid || tempDirecciones.length === 0 || isSubmitting"
+            class="inline-flex justify-center items-center px-4 py-3 border border-transparent text-sm font-semibold rounded-lg text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-sm hover:shadow-md"
+          >
+            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+            </svg>
+            {{ isSubmitting ? 'Guardando...' : 'Guardar Usuario' }}
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <!-- Mensajes de éxito y error -->
+    <div *ngIf="successMessage" class="bg-green-50 border border-green-200 rounded-md p-4 mb-6">
+      <div class="flex items-center">
+        <svg class="h-5 w-5 text-green-400 mr-2" fill="currentColor" viewBox="0 0 20 20">
+          <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"/>
+        </svg>
+        <p class="text-sm font-medium text-green-800">{{ successMessage }}</p>
+      </div>
+    </div>
+
+    <div *ngIf="errorMessage" class="bg-red-50 border border-red-200 rounded-md p-4 mb-6">
+      <div class="flex items-center">
+        <svg class="h-5 w-5 text-red-400 mr-2" fill="currentColor" viewBox="0 0 20 20">
+          <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"/>
+        </svg>
+        <p class="text-sm font-medium text-red-800">{{ errorMessage }}</p>
+      </div>
+    </div>
+
+    <!-- Lista de Usuarios y Direcciones -->
+    <div *ngIf="usuariosFiltrados.length > 0" class="space-y-6">
+      <div *ngFor="let usuario of usuariosFiltrados" class="bg-white shadow-sm rounded-lg overflow-hidden">
+        <div class="p-6">
+          <div class="flex items-start justify-between">
+            <div class="flex-1">
+              <h3 class="text-lg font-medium text-gray-900">{{ usuario.nombre }}</h3>
+              <p class="mt-1 text-sm text-gray-500">{{ usuario.email }}</p>
+              <p class="text-sm text-gray-500">Teléfono: {{ usuario.telefono }}</p>
+            </div>
+            <!-- Botones de acción -->
+            <div class="flex gap-2">
+              <!-- Botón editar usuario -->
+              <button
+                (click)="editUsuario(usuario)"
+                class="p-2 text-green-600 hover:text-green-800 hover:bg-green-50 rounded-md transition-colors"
+                title="Editar usuario"
+              >
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                </svg>
+              </button>
+              <!-- Botón eliminar usuario -->
+              <button
+                (click)="deleteUsuario(usuario)"
+                class="p-2 text-red-600 hover:text-red-800 hover:bg-red-50 rounded-md transition-colors"
+                title="Eliminar usuario y todas sus direcciones"
+              >
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          <!-- Formulario de edición -->
+          <div *ngIf="editingUsuarioId === usuario.id" class="mt-4 p-6 bg-white rounded-lg border-2 border-green-300 shadow-md">
+            <h4 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+              <svg class="w-5 h-5 mr-2 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+              </svg>
+              Editar Usuario y Dirección
+            </h4>
+            <form [formGroup]="editUsuarioForm" (ngSubmit)="saveUsuarioChanges(usuario.id)" class="space-y-6">
+              <!-- Datos del Usuario -->
+              <div>
+                <h5 class="text-sm font-semibold text-gray-700 uppercase mb-3 pb-2 border-b border-gray-200">
+                  📋 Datos del Usuario
+                </h5>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Nombre *</label>
+                    <input 
+                      type="text" 
+                      formControlName="nombre" 
+                      class="block w-full px-4 py-2.5 text-gray-900 bg-gray-50 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-colors"
+                      placeholder="Ingrese el nombre completo"
+                    >
+                  </div>
+                  <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Email *</label>
+                    <input 
+                      type="email" 
+                      formControlName="email" 
+                      class="block w-full px-4 py-2.5 text-gray-900 bg-gray-50 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-colors"
+                      placeholder="correo@ejemplo.com"
+                    >
+                  </div>
+                  <div class="md:col-span-2">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Teléfono *</label>
+                    <input 
+                      type="tel" 
+                      formControlName="telefono" 
+                      class="block w-full px-4 py-2.5 text-gray-900 bg-gray-50 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-colors"
+                      placeholder="+56 9 1234 5678"
+                    >
+                  </div>
+                </div>
+              </div>
+
+              <!-- Datos de la Dirección -->
+              <div>
+                <h5 class="text-sm font-semibold text-gray-700 uppercase mb-3 pb-2 border-b border-gray-200">
+                  📍 Dirección
+                </h5>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div class="md:col-span-2">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Calle y Número *</label>
+                    <input 
+                      type="text" 
+                      formControlName="calle" 
+                      class="block w-full px-4 py-2.5 text-gray-900 bg-gray-50 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-colors"
+                      placeholder="Ej: Av. Libertador 1234"
+                    >
+                  </div>
+                  <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Comuna *</label>
+                    <input 
+                      type="text" 
+                      formControlName="comuna" 
+                      class="block w-full px-4 py-2.5 text-gray-900 bg-gray-50 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-colors"
+                      placeholder="Ej: Providencia"
+                    >
+                  </div>
+                  <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Ciudad *</label>
+                    <input 
+                      type="text" 
+                      formControlName="ciudad" 
+                      class="block w-full px-4 py-2.5 text-gray-900 bg-gray-50 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-colors"
+                      placeholder="Ej: Santiago"
+                    >
+                  </div>
+                  <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Código Postal *</label>
+                    <input 
+                      type="text" 
+                      formControlName="codigoPostal" 
+                      class="block w-full px-4 py-2.5 text-gray-900 bg-gray-50 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-colors"
+                      placeholder="Ej: 7500000"
+                    >
+                  </div>
+                  <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">País *</label>
+                    <input 
+                      type="text" 
+                      formControlName="pais" 
+                      class="block w-full px-4 py-2.5 text-gray-900 bg-gray-50 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-colors"
+                      placeholder="Ej: Chile"
+                    >
+                  </div>
+                </div>
+              </div>
+
+              <!-- Botones de acción -->
+              <div class="flex gap-3 pt-4 border-t border-gray-200">
+                <button
+                  type="submit"
+                  [disabled]="editUsuarioForm.invalid || isSubmitting"
+                  class="flex-1 inline-flex justify-center items-center px-4 py-3 border border-transparent text-sm font-semibold rounded-lg text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-sm hover:shadow-md"
+                >
+                  <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                  </svg>
+                  {{ isSubmitting ? 'Guardando cambios...' : 'Guardar Cambios' }}
+                </button>
+                <button
+                  type="button"
+                  (click)="cancelEditUsuario()"
+                  class="flex-1 inline-flex justify-center items-center px-4 py-3 border border-gray-300 text-sm font-semibold rounded-lg text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-all shadow-sm hover:shadow-md"
+                >
+                  <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                  </svg>
+                  Cancelar
+                </button>
+              </div>
+            </form>
+          </div>
+          
+          <!-- Direcciones del Usuario -->
+          <div class="mt-4">
+            <div class="flex items-center justify-between mb-3">
+              <h4 class="text-sm font-semibold text-gray-900">
+                📍 Direcciones ({{ direcciones[usuario.id]?.length || 0 }})
+              </h4>
+              <button
+                (click)="showAddressForm = showAddressForm === usuario.id ? null : usuario.id"
+                class="inline-flex items-center px-3 py-1.5 text-xs font-medium text-blue-700 bg-blue-50 border border-blue-300 rounded-md hover:bg-blue-100 transition-colors"
+              >
+                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+                </svg>
+                {{ showAddressForm === usuario.id ? 'Cancelar' : 'Agregar Dirección' }}
+              </button>
+            </div>
+
+            <!-- Formulario para agregar dirección -->
+            <div *ngIf="showAddressForm === usuario.id" class="mb-3 p-4 bg-blue-50 rounded-lg border border-blue-200">
+              <h5 class="text-sm font-semibold text-gray-900 mb-3">Nueva Dirección</h5>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <div class="md:col-span-2">
+                  <label class="block text-xs font-medium text-gray-700 mb-1">Calle y Número *</label>
+                  <input 
+                    type="text" 
+                    [(ngModel)]="newDireccion.calle"
+                    class="block w-full px-3 py-2 text-sm text-gray-900 bg-white border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    placeholder="Ej: Av. Libertador 1234"
+                  >
+                </div>
+                <div>
+                  <label class="block text-xs font-medium text-gray-700 mb-1">Comuna *</label>
+                  <input 
+                    type="text" 
+                    [(ngModel)]="newDireccion.comuna"
+                    class="block w-full px-3 py-2 text-sm text-gray-900 bg-white border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    placeholder="Ej: Providencia"
+                  >
+                </div>
+                <div>
+                  <label class="block text-xs font-medium text-gray-700 mb-1">Ciudad *</label>
+                  <input 
+                    type="text" 
+                    [(ngModel)]="newDireccion.ciudad"
+                    class="block w-full px-3 py-2 text-sm text-gray-900 bg-white border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    placeholder="Ej: Santiago"
+                  >
+                </div>
+                <div>
+                  <label class="block text-xs font-medium text-gray-700 mb-1">Código Postal *</label>
+                  <input 
+                    type="text" 
+                    [(ngModel)]="newDireccion.codigoPostal"
+                    class="block w-full px-3 py-2 text-sm text-gray-900 bg-white border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    placeholder="Ej: 7500000"
+                  >
+                </div>
+                <div>
+                  <label class="block text-xs font-medium text-gray-700 mb-1">País *</label>
+                  <input 
+                    type="text" 
+                    [(ngModel)]="newDireccion.pais"
+                    class="block w-full px-3 py-2 text-sm text-gray-900 bg-white border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    placeholder="Ej: Chile"
+                  >
+                </div>
+              </div>
+              <div class="flex gap-2 mt-3">
+                <button
+                  (click)="createDireccion(usuario.id)"
+                  [disabled]="isCreatingAddress || !isValidNewDireccion()"
+                  class="flex-1 inline-flex justify-center items-center px-3 py-2 text-xs font-semibold rounded-md text-white bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                >
+                  <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                  </svg>
+                  {{ isCreatingAddress ? 'Guardando...' : 'Guardar' }}
+                </button>
+                <button
+                  (click)="cancelAddAddress()"
+                  class="flex-1 inline-flex justify-center items-center px-3 py-2 text-xs font-semibold rounded-md text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 transition-colors"
+                >
+                  Cancelar
+                </button>
+              </div>
+            </div>
+
+            <!-- Lista de direcciones -->
+            <div *ngIf="direcciones[usuario.id]?.length" class="space-y-2">
+              <div *ngFor="let direccion of direcciones[usuario.id]" class="bg-gray-50 p-3 rounded-md border border-gray-200 flex items-start justify-between hover:bg-gray-100 transition-colors">
+                <div class="flex-1">
+                  <div class="space-y-1">
+                    <p class="text-sm font-medium text-gray-900">
+                      <span class="font-medium">Dirección:</span> {{ direccion.calle }}
+                    </p>
+                    <p class="text-xs text-gray-600">
+                      <span class="font-medium">Comuna:</span> {{ direccion.comuna }}
+                    </p>
+                    <p class="text-xs text-gray-600">
+                      <span class="font-medium">Ciudad:</span> {{ direccion.ciudad }}
+                    </p>
+                    <p class="text-xs text-gray-600">
+                      <span class="font-medium">Código Postal:</span> {{ direccion.codigoPostal }}
+                    </p>
+                    <p class="text-xs text-gray-600">
+                      <span class="font-medium">País:</span> {{ direccion.pais }}
+                    </p>
+                  </div>
+                </div>
+                <!-- Botón eliminar dirección -->
+                <button
+                  (click)="deleteDireccion(direccion, usuario.id)"
+                  class="ml-3 p-1.5 text-red-600 hover:text-red-800 hover:bg-red-100 rounded transition-colors"
+                  title="Eliminar dirección"
+                >
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                  </svg>
+                </button>
+              </div>
+            </div>
+
+            <!-- Sin direcciones -->
+            <div *ngIf="!direcciones[usuario.id]?.length && showAddressForm !== usuario.id" class="text-center py-4 bg-gray-50 rounded-lg border border-gray-200">
+              <svg class="mx-auto h-8 w-8 text-gray-400 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+              </svg>
+              <p class="text-xs text-gray-500">No hay direcciones registradas</p>
+            </div>
+          </div>
+
+          <!-- Sección de comentarios -->
+          <div class="mt-6">
+            <div class="flex items-center justify-between mb-3">
+              <h4 class="text-sm font-semibold text-gray-900">
+                💬 Comentarios ({{ getUserComentarioCount(usuario.id) }})
+              </h4>
+              <button
+                (click)="showAddressForm = showAddressForm === -usuario.id ? null : -usuario.id"
+                class="inline-flex items-center px-3 py-1.5 text-xs font-medium text-green-700 bg-green-50 border border-green-300 rounded-md hover:bg-green-100 transition-colors"
+              >
+                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+                </svg>
+                {{ showAddressForm === -usuario.id ? 'Cancelar' : 'Agregar Comentario' }}
+              </button>
+            </div>
+
+            <!-- Formulario para agregar comentario -->
+            <div *ngIf="showAddressForm === -usuario.id" class="mb-3 p-4 bg-green-50 rounded-lg border border-green-200">
+              <h5 class="text-sm font-semibold text-gray-900 mb-3">Nuevo Comentario</h5>
+              <div class="space-y-3">
+                <div>
+                  <label class="block text-xs font-medium text-gray-700 mb-1">Candidato *</label>
+                  <input 
+                    type="text" 
+                    [(ngModel)]="newComentario.candidato"
+                    [ngModelOptions]="{standalone: true}"
+                    class="block w-full px-3 py-2 text-sm text-gray-900 bg-white border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                    placeholder="Ej: Juan Pérez"
+                  >
+                </div>
+                <div>
+                  <label class="block text-xs font-medium text-gray-700 mb-1">Texto del Comentario *</label>
+                  <textarea 
+                    [(ngModel)]="newComentario.textoComentario"
+                    [ngModelOptions]="{standalone: true}"
+                    rows="3"
+                    class="block w-full px-3 py-2 text-sm text-gray-900 bg-white border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500 resize-none"
+                    placeholder="Escriba aquí su comentario..."
+                  ></textarea>
+                </div>
+              </div>
+              <div class="flex gap-2 mt-3">
+                <button
+                  (click)="createComentario(usuario.id)"
+                  [disabled]="!isValidNewComentario() || isCreatingAddress"
+                  class="flex-1 inline-flex justify-center items-center px-3 py-2 text-xs font-semibold rounded-md text-white bg-green-600 hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                >
+                  <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+                  </svg>
+                  {{ isCreatingAddress ? 'Guardando...' : 'Agregar Comentario' }}
+                </button>
+                <button
+                  (click)="showAddressForm = null; resetNewComentario()"
+                  class="flex-1 inline-flex justify-center items-center px-3 py-2 text-xs font-semibold rounded-md text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 transition-colors"
+                >
+                  Cancelar
+                </button>
+              </div>
+            </div>
+
+            <!-- Lista de comentarios -->
+            <div *ngIf="comentarios[usuario.id]?.length" class="space-y-2">
+              <div *ngFor="let comentario of comentarios[usuario.id]" class="bg-green-50 p-3 rounded-md border border-green-200 flex items-start justify-between">
+                <div class="flex-1">
+                  <p class="text-sm font-medium text-gray-900">{{ comentario.candidato }}</p>
+                  <p class="text-xs text-gray-600 mt-1">{{ comentario.textoComentario }}</p>
+                  <p class="text-xs text-gray-400 mt-2">{{ comentario.fechaComentario | date:'dd/MM/yyyy HH:mm' }}</p>
+                </div>
+                <!-- Botón eliminar comentario -->
+                <button
+                  (click)="deleteComentario(comentario, usuario.id)"
+                  class="ml-3 p-1.5 text-red-600 hover:text-red-800 hover:bg-red-100 rounded transition-colors"
+                  title="Eliminar comentario"
+                >
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                  </svg>
+                </button>
+              </div>
+            </div>
+
+            <!-- Sin comentarios -->
+            <div *ngIf="!comentarios[usuario.id]?.length" class="text-center py-4 bg-gray-50 rounded-lg border border-gray-200">
+              <svg class="mx-auto h-8 w-8 text-gray-400 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
+              </svg>
+              <p class="text-xs text-gray-500">No hay comentarios registrados</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Estado de Carga -->
+    <div *ngIf="isLoading" class="text-center py-6">
+      <p class="text-gray-500">Cargando...</p>
+    </div>
+    
+    <!-- Sin Resultados -->
+    <div *ngIf="!isLoading && usuariosFiltrados.length === 0 && usuarios.length === 0" class="text-center py-6">
+      <div class="text-gray-400 mb-3">
+        <svg class="w-16 h-16 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"/>
+        </svg>
+      </div>
+      <p class="text-gray-500 text-lg">No hay usuarios registrados</p>
+      <p class="text-sm text-gray-400 mt-1">Crea el primer usuario usando el botón "Nuevo Usuario y Dirección"</p>
+    </div>
+
+    <!-- Sin Resultados de Búsqueda -->
+    <div *ngIf="!isLoading && usuariosFiltrados.length === 0 && usuarios.length > 0" class="text-center py-6">
+      <div class="text-gray-400 mb-3">
+        <svg class="w-16 h-16 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+        </svg>
+      </div>
+      <p class="text-gray-500 text-lg">No se encontraron usuarios</p>
+      <p class="text-sm text-gray-400 mt-1">No hay usuarios con el email "{{ searchEmail }}"</p>
+      <button 
+        (click)="clearSearch()"
+        class="mt-3 text-blue-600 hover:text-blue-800 text-sm font-medium"
+      >
+        Limpiar búsqueda
+      </button>
+    </div>
+  </div>
+</div>

@@ -1,8 +1,8 @@
 export interface Direccion {
   id?: number;
   calle: string;
+  comuna: string;
   ciudad: string;
-  estado: string;
   codigoPostal: string;
   pais: string;
   usuarioId: number;
@@ -11,8 +11,8 @@ export interface Direccion {
 export interface DireccionResponse {
   id: number;
   calle: string;
+  comuna: string;
   ciudad: string;
-  estado: string;
   codigoPostal: string;
   pais: string;
   usuarioId: number;
@@ -20,8 +20,8 @@ export interface DireccionResponse {
 
 export interface CreateDireccionRequest {
   calle: string;
+  comuna: string;
   ciudad: string;
-  estado: string;
   codigoPostal: string;
   pais: string;
   usuarioId: number;

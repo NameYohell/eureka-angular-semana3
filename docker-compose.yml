@@ -1,6 +1,7 @@
 version: '3.8'
 
 services:
+  # Servicio para PRODUCCIÓN
   eureka-app:
     build:
       context: .
@@ -8,11 +9,19 @@ services:
     container_name: eureka-angular-app
     ports:
       - "8080:80"
+    environment:
+      - NODE_ENV=production
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
     networks:
-      - eureka-network
+      - microservices-network
 
-  # Servicio para desarrollo (opcional)
+  # Servicio para DESARROLLO con hot-reload
   eureka-dev:
     build:
       context: .
@@ -21,16 +30,21 @@ services:
     ports:
       - "4200:4200"
     volumes:
-      - .:/app
-      - /app/node_modules
+      - ./src:/app/src:ro
+      - ./public:/app/public:ro
+      - ./angular.json:/app/angular.json:ro
+      - ./tsconfig.json:/app/tsconfig.json:ro
+      - ./tsconfig.app.json:/app/tsconfig.app.json:ro
+      - ./tailwind.config.ts:/app/tailwind.config.ts:ro
     environment:
+      - NODE_ENV=development
       - CHOKIDAR_USEPOLLING=true
+      - NG_CLI_ANALYTICS=false
     restart: unless-stopped
     networks:
-      - eureka-network
-    profiles:
-      - dev
+      - microservices-network
 
 networks:
-  eureka-network:
-    driver: bridge
+  microservices-network:
+    external: true
+    name: udemy-apirest-micro_microservices-network
